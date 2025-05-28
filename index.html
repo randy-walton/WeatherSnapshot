@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Weather Snapshot</title>
+  <!-- https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js -->
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    #snapshot { border: 1px solid #ccc; padding: 20px; display: inline-block; background: #f0f8ff; }
+    button { margin-top: 20px; padding: 10px 20px; }
+  </style>
+</head>
+<body>
+  <h1>Weather Snapshot</h1>
+  <div id="snapshot">
+    <p>Loading weather data...</p>
+  </div>
+  <button onclick="saveAsImage()">Save Snapshot as Image</button>
+
+  <script>
+    async function fetchWeather(lat, lon) {
+      const url = `https://api.weather.gc.ca/collections/weather-observations/items?lat=${lat}&lon=${lon}&f=json`;
+      const res = await fetch(url);
+      const data = await res.json();
+      return data.features[0].properties;
+    }
+
+    function updateSnapshot(data, lat, lon) {
+      const container = document.getElementById('snapshot');
+      const now = new Date().toLocaleString();
+      container.innerHTML = `
+        <h2>${data.stationName}</h2>
+        <p><strong>Time:</strong> ${now}</p>
+        <p><strong>Temperature:</strong> ${data.temperature} °C</p>
+        <p><strong>Wind:</strong> ${data.windSpeed} km/h</p>
+        <p><strong>Humidity:</strong> ${data.relativeHumidity} %</p>
+        <p><strong>Weather:</strong> ${data.textSummary}</p>
+        <p><strong>Location:</strong> Lat ${lat.toFixed(2)}, Lon ${lon.toFixed(2)}</p>
+      `;
+    }
+
+    function saveAsImage() {
+      html2canvas(document.querySelector("#snapshot")).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'weather_snapshot.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+
+navigator.geolocation.getCurrentPosition(async position => {
+      const lat = 51.2904573; // Example coordinates for Calgary, Canada
+      const lon = 113.9836961;
+      const weather = await fetchWeather(lat, lon);
+      updateSnapshot(weather, lat, lon);
+    }, () => {
+      document.getElementById('snapshot').innerText = 'Unable to access location.';
+    });
+  </script>
+
+<!--    navigator.geolocation.getCurrentPosition(async position => {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      const weather = await fetchWeather(lat, lon);
+      updateSnapshot(weather, lat, lon);
+    }, () => {
+      document.getElementById('snapshot').innerText = 'Unable to access location.';
+    });
+-->
+
+</body>
+</html>
