@@ -49,8 +49,8 @@
     }
 
 navigator.geolocation.getCurrentPosition(async position => {
-      const lat = 51.2904573; // Example coordinates for Calgary, Canada
-      const lon = 113.9836961;
+      const lat = 51.045; // Example coordinates for Calgary, Canada
+      const lon = -114.057; // Example coordinates for Calgary, Canada
       const weather = await fetchWeather(lat, lon);
       updateSnapshot(weather, lat, lon);
     }, () => {
