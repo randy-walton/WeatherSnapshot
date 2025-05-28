@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Weather Snapshot</title>
-  <!-- https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js -->
+  <title>Weather Snapshot - Calgary</title>
+  https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js
   <style>
     body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
     #snapshot { border: 1px solid #ccc; padding: 20px; display: inline-block; background: #f0f8ff; }
@@ -11,31 +11,41 @@
   </style>
 </head>
 <body>
-  <h1>Weather Snapshot</h1>
+  <h1>Weather Snapshot - Calgary</h1>
   <div id="snapshot">
     <p>Loading weather data...</p>
   </div>
   <button onclick="saveAsImage()">Save Snapshot as Image</button>
 
   <script>
-    async function fetchWeather(lat, lon) {
-      const url = `https://api.weather.gc.ca/collections/weather-observations/items?lat=${lat}&lon=${lon}&f=json`;
-      const res = await fetch(url);
-      const data = await res.json();
-      return data.features[0].properties;
+    async function fetchWeatherXML() {
+      const response = await fetch("https://dd.weather.gc.ca/citypage_weather/xml/AB/s0000047_e.xml");
+      const text = await response.text();
+      const parser = new DOMParser();
+      return parser.parseFromString(text, "application/xml");
     }
 
-    function updateSnapshot(data, lat, lon) {
-      const container = document.getElementById('snapshot');
-      const now = new Date().toLocaleString();
+    function extractData(xml) {
+      const get = tag => xml.querySelector(tag)?.textContent || "N/A";
+      return {
+        location: get("location > name"),
+        temperature: get("currentConditions > temperature"),
+        wind: get("currentConditions > wind > speed"),
+        humidity: get("currentConditions > relativeHumidity"),
+        weather: get("currentConditions > condition"),
+        time: get("currentConditions > dateTime > timeStamp")
+      };
+    }
+
+    function updateSnapshot(data) {
+      const container = document.getElementById("snapshot");
       container.innerHTML = `
-        <h2>${data.stationName}</h2>
-        <p><strong>Time:</strong> ${now}</p>
+        <h2>${data.location}</h2>
+        <p><strong>Time:</strong> ${data.time}</p>
         <p><strong>Temperature:</strong> ${data.temperature} °C</p>
-        <p><strong>Wind:</strong> ${data.windSpeed} km/h</p>
-        <p><strong>Humidity:</strong> ${data.relativeHumidity} %</p>
-        <p><strong>Weather:</strong> ${data.textSummary}</p>
-        <p><strong>Location:</strong> Lat ${lat.toFixed(2)}, Lon ${lon.toFixed(2)}</p>
+        <p><strong>Wind:</strong> ${data.wind} km/h</p>
+        <p><strong>Humidity:</strong> ${data.humidity} %</p>
+        <p><strong>Weather:</strong> ${data.weather}</p>
       `;
     }
 
@@ -48,25 +58,12 @@
       });
     }
 
-navigator.geolocation.getCurrentPosition(async position => {
-      const lat = 51.045; // Example coordinates for Calgary, Canada
-      const lon = -114.057; // Example coordinates for Calgary, Canada
-      const weather = await fetchWeather(lat, lon);
-      updateSnapshot(weather, lat, lon);
-    }, () => {
-      document.getElementById('snapshot').innerText = 'Unable to access location.';
-    });
+    fetchWeatherXML()
+      .then(xml => extractData(xml))
+      .then(data => updateSnapshot(data))
+      .catch(() => {
+        document.getElementById("snapshot").innerText = "Failed to load weather data.";
+      });
   </script>
-
-<!--    navigator.geolocation.getCurrentPosition(async position => {
-      const lat = position.coords.latitude;
-      const lon = position.coords.longitude;
-      const weather = await fetchWeather(lat, lon);
-      updateSnapshot(weather, lat, lon);
-    }, () => {
-      document.getElementById('snapshot').innerText = 'Unable to access location.';
-    });
--->
-
 </body>
 </html>
