@@ -2,14 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Weather Snapshot 9</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></dy { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+  <title>UEC Weather Snapshot</title>
+  https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
     #snapshot { border: 1px solid #ccc; padding: 20px; display: inline-block; background: #f0f8ff; }
     button { margin-top: 20px; padding: 10px 20px; }
   </style>
 </head>
 <body>
-  <h1>Weather Snapshot 9</h1>
+  <h1>UEC Weather Snapshot</h1>
   <div id="snapshot">
     <p>Loading weather data...</p>
   </div>
@@ -64,3 +66,9 @@
   </script>
 </body>
 </html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+  // Ensure the html2canvas script is loaded before using it
+  if (typeof html2canvas === 'undefined') {
+    console.error('html2canvas library is not loaded.');
+  }
