@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Weather Snapshot - OpenWeatherMap</title>
-<!--  https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js -->
+  <title>Weather Snapshot</title>
+  https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js
   <style>
     body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
     #snapshot { border: 1px solid #ccc; padding: 20px; display: inline-block; background: #f0f8ff; }
@@ -11,20 +11,25 @@
   </style>
 </head>
 <body>
-  <h1>Weather Snapshot - OpenWeatherMap</h1>
+  <h1>Weather Snapshot</h1>
   <div id="snapshot">
     <p>Loading weather data...</p>
   </div>
   <button onclick="saveAsImage()">Save Snapshot as Image</button>
 
   <script>
-    const apiKey = 455fe2cf1cb789de5bdc690a0541fdb3; // Replace this with your actual API key
+    const apiKey = '455fe2cf1cb789de5bdc690a0541fdb3'; // Replace this with your actual API key
 
     async function fetchWeather(lat, lon) {
       const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
-      const res = await fetch(url);
-      const data = await res.json();
-      return data;
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Weather API error");
+        return await res.json();
+      } catch (err) {
+        console.error("Failed to fetch weather:", err);
+        document.getElementById('snapshot').innerHTML = `<p style="color:red;">Failed to load weather data.</p>`;
+      }
     }
 
     function updateSnapshot(data, lat, lon) {
@@ -54,9 +59,9 @@
       const lat = position.coords.latitude;
       const lon = position.coords.longitude;
       const weather = await fetchWeather(lat, lon);
-      updateSnapshot(weather, lat, lon);
+      if (weather) updateSnapshot(weather, lat, lon);
     }, () => {
-      document.getElementById('snapshot').innerText = 'Unable to access location.';
+      document.getElementById('snapshot').innerHTML = `<p style="color:red;">Location access denied.</p>`;
     });
   </script>
 </body>
