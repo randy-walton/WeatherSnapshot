@@ -15,7 +15,7 @@
   <div id="snapshot">
     <p>Loading weather data...</p>
   </div>
-  <p><button onclick="saveAsImage()">Save Snapshot as Image</button></p>
+  <p><button style="font-size: x-large;" onclick="saveAsImage()">Save Snapshot as Image</button></p>
 
   <script>
     const apiKey = '455fe2cf1cb789de5bdc690a0541fdb3'; // Replace this with your actual API key
@@ -49,7 +49,7 @@
     function saveAsImage() {
       html2canvas(document.querySelector("#snapshot")).then(canvas => {
         const link = document.createElement('a');
-        link.download = 'weather_snapshot.png';
+        link.download = 'UEC_weather_snapshot.png';
         link.href = canvas.toDataURL();
         link.click();
       });
